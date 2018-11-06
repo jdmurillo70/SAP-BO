@@ -1,0 +1,16 @@
+Select
+
+	T1.ItemName
+	, T0.BatchNum
+	, T2.WhsName
+	, T0.Quantity
+	, T3.AvgPrice
+	, T4.ItmsGrpNam
+
+From OIBT T0
+Inner Join OITM T1 On T0.ItemCode = T1.ItemCode
+inner Join OWHS T2 On T0.WhsCode = T2.WhsCode
+Inner Join OITW t3 On T0.ItemCode = T3.ItemCode and T0.WhsCode = T3.WhsCode
+Inner Join OITB T4 On T1.ItmsGrpCod = T4.ItmsGrpCod
+
+Where T0.WhsCode In ('10013','10013-2') and T0.Quantity > 0

@@ -1,0 +1,62 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+
+Select Distinct	T0.Docnum 'Pedido'
+				, T0.DocDueDAte 'Entrega'
+				, T2.Dscription 'Persiana'
+				,'Linea Revisión' = CASE
+			When CharIndex('Enrollable',T2.Dscription  )>0 and CHARINDEX('Premium',T2.Dscription) = 0 and CHARINDEX('2En1',T2.Dscription) = 0Then 'Enrollable'
+			When CharIndex('Enrollable',T2.Dscription  )>0 and CHARINDEX('Premium',T2.Dscription) > 0 Then 'Sheer'
+			When CharIndex('Enrollable',T2.Dscription  )>0 and CHARINDEX('2En1',T2.Dscription) > 0 Then 'Sheer'
+			When CharIndex('Sheer',T2.Dscription  )>0  Then 'Sheer'
+			When CharIndex('Panel',T2.Dscription  )>0  Then 'Panel'
+			When CharIndex('Cenefa',T2.Dscription  )>0  Then 'Panel'
+			When CharIndex('Romana',T2.Dscription  )>0  Then 'Panel'
+			When CharIndex('Telo',T2.Dscription  )>0  Then 'Panel'
+			When CharIndex('Macro',T2.Dscription  )>0  Then 'Macro'
+			When CharIndex('Venecian',T2.Dscription  )>0  Then 'Sheer'
+
+				End 
+				, Sum(T2.Quantity) Cantidad
+				, TipoDespacho = CASE
+						When T0.U_Despacho = 1 Then 'Ruta'
+						When T0.U_Despacho = 2 Then 'Recoge'
+						When T0.U_Despacho = 3 Then 'Safra Express'
+						When T0.U_Despacho = 4 Then 'Nacional'
+				END
+			
+				, 'Aprobado Despacho' = CASE
+				
+						When T3.U_ListoParaDespachar = 2 Then 'Si'
+						When T0.U_DESPACHO = 2 Then 'Si'
+						Else 'No'
+						
+				END 
+			
+
+From ORDR T0
+
+
+Left Join [@SAFR_IMPRESIONORD] T1 On T0.DocNum = T1.U_NroDocumento
+Inner Join RDR1 T2 On T0.DocEntry = T2.DocEntry
+Left Join [@SAFR_MARCADESPACHO] T3 On T0.DocNum =T3.U_NumeroPedido
+
+
+Where	T0.DocDueDate Between getdate ()-10 and getdate () + 10 
+		And T1.U_FechaFabricado Is Null
+		And Left (T2.ItemCode,1) In ('P','E')
+		And T0.CANCELED != 'Y'
+		
+		
+
+
+Group by 	T0.Docnum 
+			, T0.DocDueDAte 
+			, T2.Dscription 
+			, T0.U_DESPACHO
+			, T3.U_ListoParaDespachar
+
+
+
+
+

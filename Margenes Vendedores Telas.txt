@@ -1,0 +1,26 @@
+	select T0.Docnum
+		, T0.Docdate
+		, t0.CardName
+		, t2.ItemCode
+		, T2.ItemName
+		, T5.WhsName
+		, T3.SlpName
+		, T1.Quantity
+		,  (case when T0.DiscPrcnt !=0 then t1.INMPrice * t1.Quantity Else t1.LineTotal end) ventas
+		,- (T1.StockPrice * t1.Quantity) Costo
+		,(case when T0.DiscPrcnt !=0 then t1.INMPrice * t1.Quantity Else t1.LineTotal end - (T1.StockPrice * t1.Quantity)) margen
+		,((t1.linetotal - (T1.StockPrice * t1.Quantity))/ CASE WHEN t1.linetotal=0 THEN 1 ELSE T1.LineTotal END) pmargen
+		,LEFT(t1.ItemCode,1) NEGOCIO
+		,LEFT(T2.ItemName, CharIndex(' ',T2.ItemName)) As 'Colección'
+		, T6.City As 'Ciudad'
+		
+		From OINV T0
+	INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry
+	inner join OITM T2 ON T2.ItemCode = T1.ItemCode
+	Inner Join OSLP T3 ON T1.SlpCode = T3.SlpCode
+	Inner Join OWHS T5 ON T1.WhsCode = T5.WhsCode
+	Inner Join OCRD T6 On T0.CardCode = T6.CardCode
+
+	WHERE T0.DocDate BETWEEN convert(date,'1/10/2018',103) and convert(date,getdate()-1,103)
+				and T0.CANCELED != 'Y'
+				and LEFT (T1.ItemCode,1) =  'T'

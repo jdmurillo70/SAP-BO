@@ -1,0 +1,24 @@
+Select
+   T0.DocDate 'Fecha Orden'
+   , T0.NumAtCard 'No Importación'
+   , T1.CardName 'Proveedor'
+   , T2.U_FechaEstimadaProveedor 'Fecha Inicial'
+	, 'Estado Pedido' = CASE T2.U_UbicacionPedido
+                                               When 1 Then 'Origen'
+                                               When 2 Then 'Agua'
+                                               When 3 Then 'Reserva'
+                                               When 4 Then 'SPRB'
+                                               When 5 Then 'ZF SN'
+                                               When 6 Then 'Fabrica'
+                                               When 7 Then 'Carretera'
+                        When 8 Then 'ZFN'
+                               END
+	, T2.U_FechaEstDespacho 'Fecha Salida'
+	, T2.U_FechaEstLlegada 'Estimada Puerto'
+   
+From OPOR T0 
+
+Left Join OCRD T1 On T0.U_SUBPROVEEDOR = T1.CardCode
+Inner Join [@SAFR_ESTIMPORTACION] T2 On T0.NumAtCard = T2.Code
+
+Where Left(T0.CardCode,3) = 'PEX' and T0.DocStatus = 'O'

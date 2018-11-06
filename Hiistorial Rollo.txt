@@ -1,0 +1,17 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+
+Select  T3.DocDate
+		, t1.ItemName
+		, T2.DistNumber As 'Número de Rollo'
+		, T0.Quantity
+		, T3.DocType
+		
+		
+from ITL1 T0
+
+Inner Join OITM T1 ON T0.ItemCode = T1.ItemCode
+Left Join  OBTN T2 ON T2.ItemCode = T0.ItemCode And T2.SysNumber = t0.SysNumber And  T1.manbtchnum = 'Y'
+Left Join  OITL T3 ON T3.LogEntry = T0.LogEntry
+
+Where T0.ItemCode = 'I100001287' and T2.DistNumber = '233'

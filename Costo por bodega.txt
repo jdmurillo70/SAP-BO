@@ -1,0 +1,11 @@
+select	T1.ItemCode, T1.ItemName As 'Descripción', 
+		T0.AvgPrice As 'Costo', 
+		t0.Onhand As 'Saldo'
+		 ,T2.WhsName
+		, t3.ItmsGrpNam
+from OITW T0 
+INNER JOIN OITM T1 ON t0.ItemCode = t1.ItemCode
+Inner join OWHS t2 on T0.WhsCode = t2.WhsCode
+Inner Join OITB T3 On T1.ItmsGrpCod = T3.ItmsGrpCod
+where LEFT(T0.Itemcode,1) = ('i') and T0.AvgPrice != 0 and T2.whscode In ( '10011')
+order by T1.Itemname

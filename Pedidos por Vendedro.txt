@@ -1,0 +1,50 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+Select 	t0.Docnum 'No Pedido'
+		,T0.Docdate 'Fecha Pedido'
+		, T2.SlpName 'Vendedor'
+		, T0.CardName 'Cliente'
+		, Coalesce(T0.U_nropedfisico, T0.U_nropedidoportal) As 'Fisico/Portal'
+		, Sum(T1.LineTotal) Aprobados
+FROM ORDR T0
+
+Inner Join RDR1 T1 On T0.DocEntry = T1.DocEntry
+Inner Join OSLP T2 On T0.SlpCode = T2.SlpCode
+
+Where 	T0.DocdueDate Between '1/11/2018' and '30/11/2018' 
+		and T0.DocDate between '31/12/2016' and getdate()-1
+		and LEFT(T1.ItemCode,1) IN('P','I','M') 
+		and  T0.CANCELED !='Y'
+		
+Group by 	T2.SlpName
+			, T0.Docnum
+			, T0.CardName
+			, T0.U_NROPEDFISICO
+			, T0.Docdate
+			, T0.U_NroPedidoPortal
+**************************************************			
+			
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+Select 	t0.Docnum 'No Pedido'
+		,T0.Docdate 'Fecha Pedido'
+		, T2.SlpName 'Vendedor'
+		, T0.CardName 'Cliente'
+		, Coalesce(T0.U_nropedfisico, T0.U_nropedidoportal) As 'Fisico/Portal'
+		, Sum(T1.LineTotal) Aprobados
+FROM ORDR T0
+
+Inner Join RDR1 T1 On T0.DocEntry = T1.DocEntry
+Inner Join OSLP T2 On T0.SlpCode = T2.SlpCode
+
+Where 	T0.DocdueDate Between '1/11/2018' and '30/11/2018' 
+		and T0.DocDate between '31/12/2016' and getdate()-1
+		and LEFT(T1.ItemCode,1) IN('E') 
+		and  T0.CANCELED !='Y'
+		
+Group by 	T2.SlpName
+			, T0.Docnum
+			, T0.CardName
+			, T0.U_NROPEDFISICO
+			, T0.Docdate
+			, T0.U_NroPedidoPortal

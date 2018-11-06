@@ -1,0 +1,251 @@
+USE [SFRTEST0001]
+GO
+/****** Object:  StoredProcedure [dbo].[SPDescuentoMedidasPersiana]    Script Date: 28/09/2018 4:38:52 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Jose Fabian Laverde
+-- Create date: 21/09/2018
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[SPDescuentoMedidasPersiana]
+	-- Add the parameters for the stored procedure here
+	@DocNum INT,
+	@LineNum INT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	--SAFR_DESCPERCAMPOS
+	--SAFR_DESCPERSIANAS
+	--SAFR_DESCPERSIANROW
+
+	--RECIBO EL DOCNUM Y LO CONVIERTO A DOCENTRY
+	DECLARE @DocEntry AS INT=(SELECT DocEntry FROM ORDR WHERE DocNum=@DocNum)
+	DECLARE @Tela VARCHAR(100)
+	DECLARE @Motorizado VARCHAR(100)
+	DECLARE @Ancho NUMERIC(19,3),@Alto NUMERIC(19,3)
+	DECLARE @GrupoAsoc VARCHAR(3)
+	DECLARE @TUBO VARCHAR(100)=''
+	DECLARE @Mecanismo VARCHAR(100)
+	DECLARE @Cabezal VARCHAR(100)
+	
+	SELECT 
+	@Tela=RDR1.U_TelaPersiana,
+	@Motorizado=CASE WHEN RDR1.U_MotorEMR='0' AND RDR1.U_MotPANRAP='0' THEN '1' ELSE '2' END,
+	@Ancho=RDR1.Width1,
+	@Alto=RDR1.Height1,
+	@GrupoAsoc=OITM.U_GrupoAsoc
+	FROM 
+	RDR1 INNER JOIN OITM ON RDR1.ItemCode=OITM.ItemCode
+	WHERE RDR1.DocEntry=@DocEntry
+	AND RDR1.LineNum=@LineNum
+
+	/*CALCULO DE TUBO*/
+	EXEC [SPCalculaTubo] @GrupoAsoc,@Ancho,@Alto,@Tela,@Motorizado,'','',@TUBO out,@Mecanismo OUT,@Cabezal OUT
+
+
+
+	--TODO: ESPACIO PARA CALCULAR EL TIPO DE MECANISMO
+	
+	BEGIN--CAPTURO LOS CAMPOS QUE SE USAN POR CADA GRUPO DE ASOCIACION
+	DECLARE @ResultRDR1 VARCHAR(MAX)
+
+	/*CREO EL STRING QUE CONTIENE LOS 
+	CAMPOS DINAMICOS ASOCIADOS AL GRUPO DE ASOCIACIÓN DE PERSIANAS*/
+	SELECT @ResultRDR1 = + COALESCE(@ResultRDR1 + ',','') + CAST(ISNULL(CASE WHEN U_Variable ='-1' THEN 'Width1'
+																			WHEN U_Variable='-2' THEN 'Height1' 
+																			ELSE 'U_' + VARIABLE.NAME END,'') AS VARCHAR)
+	FROM [@HEIN_VARGRUPO] GRUPO INNER JOIN [@HEIN_VARIABLE] VARIABLE ON GRUPO.U_VARIABLE=VARIABLE.CODE
+	AND U_GrupoAsoc=@GrupoAsoc
+	AND 'U_'+ VARIABLE.Name IN(SELECT U_NombreCampo FROM [@SAFR_DESCPERCAMPOS] WHERE U_GrupoAsoc=@GrupoAsoc)
+	
+	--SE ESPECIFICAN LOS CAMPOS QUE VAN FIJOS (REQUERIDOS PARA LA UNION DE LAS TABLAS MAESTRAS)
+	DECLARE @FieldsCreateTable VARCHAR(MAX) = 'DocEntry INT,LineNum INT,GrupoAsoc VARCHAR(100),Dscription VARCHAR(100)'
+
+	--STRING QUE CONTIENE LOS CAMPOS DINAMICOS ASOCIADOS AL GRUPO DE ASOCIACIÓN DE PERSIANAS CON TIPO DE DATO (USADO PARA CREAR LA TABLA TEMPORAL DINAMICA)
+	SELECT @FieldsCreateTable = COALESCE(@FieldsCreateTable + ',','') + CAST(ISNULL(CASE WHEN U_Variable ='-1' THEN 'Width1'
+																			WHEN U_Variable='-2' THEN 'Height1' 
+																			ELSE 'U_' + VARIABLE.NAME END + ' VARCHAR(100)','' ) AS VARCHAR)
+	FROM [@HEIN_VARGRUPO] GRUPO INNER JOIN [@HEIN_VARIABLE] VARIABLE ON GRUPO.U_VARIABLE=VARIABLE.CODE
+	AND U_GrupoAsoc=@GrupoAsoc
+	AND 'U_'+ VARIABLE.Name IN(SELECT U_NombreCampo FROM [@SAFR_DESCPERCAMPOS] WHERE U_GrupoAsoc=@GrupoAsoc)
+
+
+	--CREO EL SQL DINAMICO
+	DECLARE @execsql2 VARCHAR(MAX)= '
+
+									'+ /*CREO LA TABLA TEMPORAL*/ + '
+									CREATE TABLE #ORDERLINE(' + @FieldsCreateTable + ')
+
+
+									INSERT INTO #ORDERLINE 
+									SELECT RDR1.DocEntry,LineNum,OITM.U_GrupoAsoc,Dscription,
+									' + @ResultRDR1 + ' 
+									FROM RDR1 INNER JOIN OITM ON OITM.ItemCode=RDR1.ItemCode WHERE RDR1.DocEntry=' + CAST(@DocEntry AS VARCHAR) + '
+									AND RDR1.LineNum=' + CAST(@LineNum AS VARCHAR) + ' 
+
+									' + /* CREAMOS LA TABLA DONDE SE ALMACENARÁN LOS DATOS CONVERTIDOS EN COLUMNAS*/ + '
+									CREATE TABLE #UNPIVOTFIELDS(
+									DocEntry INT,LineNum INT,GrupoAsoc VARCHAR(100),Dscription VARCHAR(100),FIELD VARCHAR(100),FIELDVALUE VARCHAR(100))
+
+									'+ /*CREAMOS LA TABLA DONDE SE ENCUENTRAN LOS DESCUENTOS*/ +'
+									CREATE TABLE #DESCUENTOS(
+									CODE VARCHAR(100),
+									NombreDescuento VARCHAR(100),
+									NombreCampo VARCHAR(100),
+									ValorComponente VARCHAR(100),
+									NombreComponente VARCHAR(100),
+									AnchoDescuento NUMERIC(19,3),
+									AltoDescuento NUMERIC(19,3),
+									Secuencia VARCHAR(100),
+									TipoMando VARCHAR(100)
+									)
+
+
+									' + /*TABLA DE DESCUENTOS COMPILADOS*/ +'
+									CREATE TABLE #DESCUENTOSCOMPILADOS(
+									DocEntry INT,
+									GrupoAsoc VARCHAR(100),
+									LineNum INT,
+									NombreComponente VARCHAR(100),
+									AnchoDescuento NUMERIC(19,3),
+									AltoDescuento NUMERIC(19,3)
+									)
+
+									'+ /*UNPIVOT LA TABLA DE LINEAS DE PEDIDO*/ +'
+									INSERT INTO #UNPIVOTFIELDS
+									SELECT DocEntry,LineNum,GrupoAsoc,Dscription,FIELD,FIELDVALUE
+									FROM
+									(SELECT #ORDERLINE.* FROM #ORDERLINE) TP
+									UNPIVOT
+									(FIELDVALUE FOR FIELD IN
+									('+ @ResultRDR1 +')
+									)AS unpvt
+
+									'+ /*INSERTAMOS LA INFORMACIÓN DE LOS DESCUENTOS EN UNA TABLA TEMPORAL (SE DEBE EXCLUIR LOS GRUPOS DE SOPORTES*/ +'
+									INSERT INTO #DESCUENTOS
+									SELECT 
+									SDP.CODE,
+									SDPR.U_NombreDescuento,
+									SDC.U_NombreCampo,
+									SDPR.U_ValorComponente,
+									SDPR.U_NombreComponente,
+									U_AnchoDescuento,
+									U_AltoDescuento,
+									U_Secuencia,
+									U_TipoMando
+									FROM [@SAFR_DESCPERSIANAS] SDP INNER JOIN [@SAFR_DESCPERSIANROW] SDPR ON SDP.Code=SDPR.Code
+									INNER JOIN [@SAFR_DESCPERCAMPOS] SDC ON SDPR.Code =SDC.Code AND SDPR.U_NombreDescuento=SDC.U_NombreDescuento
+									WHERE ISNULL(U_Secuencia,'''')=''''
+									
+									'+/*DESCUENTOS DE SOPORTES INTERMEDIOS
+									ENROLLABLE: SE AGREGAN DESCUENTOS DE SOPORTES PARA PERFILERIA Y TELA
+									*/ +'
+
+									INSERT INTO #DESCUENTOS
+									SELECT 
+									Code,
+									U_NombreDescuento,
+									U_NombreCampo,
+									U_ValorComponente,
+									U_NombreComponente,
+									U_AnchoDescuento,
+									U_AltoDescuento,
+									U_Secuencia,
+									U_TipoMando FROM
+									(SELECT DISTINCT
+									SDPR.Code,SDPR.U_NombreDescuento,SDC.U_NombreCampo,U_ValorComponente,U_NombreComponente,
+									(SELECT TOP 1 A.U_ValorComponente 
+											FROM [@SAFR_DESCPERSIANROW] A 
+											WHERE A.U_Secuencia=SDPR.U_Secuencia 
+											AND A.U_NombreDescuento=''SOPORTEINTI''
+											AND A.U_NombreComponente=SDPR.U_NombreComponente) SoporteIntI,
+									(SELECT TOP 1 A.U_ValorComponente 
+											FROM [@SAFR_DESCPERSIANROW] A 
+											WHERE A.U_Secuencia=SDPR.U_Secuencia 
+											AND A.U_NombreDescuento=''SOPORTEINTD''
+											AND A.U_NombreComponente=SDPR.U_NombreComponente) SoporteIntD,
+									U_AnchoDescuento,
+									U_AltoDescuento,
+									U_Secuencia,
+									U_TipoMando
+									FROM [@SAFR_DESCPERSIANROW] SDPR 
+									INNER JOIN [@SAFR_DESCPERCAMPOS] SDC ON SDPR.U_NombreDescuento=SDC.U_NombreDescuento
+									WHERE SDPR.U_NombreDescuento IN(''SOPORTEINTI'',''SOPORTEINTD'')
+									AND U_AnchoDescuento>0) QUERY
+									WHERE SoporteIntI=(SELECT FIELDVALUE FROM #UNPIVOTFIELDS WHERE FIELD=''U_SoporteIntI'') COLLATE Latin1_General_CI_AS
+									AND SoporteIntD=(SELECT FIELDVALUE FROM #UNPIVOTFIELDS WHERE FIELD=''U_SoporteIntD'') COLLATE Latin1_General_CI_AS
+									AND U_TipoMando= ''' + @Motorizado +'''
+
+
+									'+ /*INSERTAMOS LOS VALORES ASOCIADOS AL TUBO*/ +'
+									INSERT INTO #DESCUENTOS
+									SELECT
+									SDP.CODE,
+									SDPR.U_NombreDescuento,
+									'''' U_NombreCampo,
+									SDPR.U_ValorComponente,
+									SDPR.U_NombreComponente,
+									U_AnchoDescuento,
+									U_AltoDescuento,
+									U_Secuencia,
+									U_TipoMando
+									FROM [@SAFR_DESCPERSIANAS] SDP INNER JOIN [@SAFR_DESCPERSIANROW] SDPR ON SDP.CODE=SDPR.CODE
+									WHERE SDPR.U_NombreDescuento=''TUBO''
+									AND SDPR.U_ValorComponente= ''' + @TUBO +'''
+
+
+									'+ /*SELECT QUE UNE LAS TABLAS RESULTADO DEL UNPIVOT Y LOS DESCUENTOS*/ +'
+									INSERT INTO #DESCUENTOSCOMPILADOS
+									SELECT 
+									DocEntry,
+									GrupoAsoc,
+									LineNum,
+									D.NombreComponente,
+									AnchoDescuento,
+									AltoDescuento
+									FROM #DESCUENTOS D INNER JOIN #UNPIVOTFIELDS UF ON UF.FIELD=D.NombreCampo AND D.CODE=UF.GrupoAsoc
+									AND D.ValorComponente=UF.FIELDVALUE
+									AND LineNum=' + CAST(@LineNum AS VARCHAR) + '
+
+
+									'+ /*DESCUENTOS DE TUBO*/ +'
+									INSERT INTO #DESCUENTOSCOMPILADOS
+									SELECT 
+									'''' DocEntry,
+									'''' GrupoAsoc,
+									'''' LineNum,
+									NombreComponente,
+									AnchoDescuento,
+									AltoDescuento
+									FROM #DESCUENTOS
+									WHERE NombreDescuento=''TUBO''
+									AND ValorComponente='''+ @TUBO + '''
+
+
+									'+ /*SELECT FINAL SUMANDO TODAS LAS CANTIDADES */ +'
+									SELECT 
+									NombreComponente,
+									' + CAST(@Ancho AS VARCHAR) + ' + SUM(AnchoDescuento) Ancho,
+									' + CAST(@Alto AS VARCHAR) + ' + CASE WHEN SUM(AltoDescuento)=0 THEN ' + CAST(@Alto AS VARCHAR) + '*-1 ELSE SUM(AltoDescuento) END  Alto
+									FROM #DESCUENTOSCOMPILADOS
+									GROUP BY NombreComponente
+
+									'                                                    
+
+--EJECUCIÓN DE LA CONSULTA DINAMICA
+	EXEC(@execsql2)
+
+	PRINT 'ANCHO REAL ' + CAST(@Ancho AS VARCHAR)
+	PRINT 'ALTO REAL ' + CAST(@Alto AS VARCHAR)
+
+	SELECT @TUBO TipoTubo,@Mecanismo Mecanismo,@Cabezal Cabezal
+
+	END
+
+END

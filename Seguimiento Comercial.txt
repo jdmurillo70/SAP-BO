@@ -1,0 +1,24 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+Select ventas.WhsName,
+isnull(Ventas.Total_Ventas,0) factura,
+isnull(N_Credito.Total_notas,0)notas,
+(isnull(Ventas.Total_Ventas,0)-isnull(N_Credito.Total_notas,0)) ventas_netas
+
+from
+(Select T2.WhsName,Sum( case when T0.DiscPrcnt!=0 THEN T1.INMPrice*t1.Quantity ELSE T1.LineTotal END) Total_Ventas
+From OINV T0
+Inner Join INV1 T1 ON T0.DocEntry = T1.DocEntry
+Inner Join OWHS T2 on T1.WhsCode = T2.WhsCode
+Where T0.DocDate between  '1/11/2018' and getdate()-1
+ and t0.CANCELED = 'N'
+Group by T2.WhsName) Ventas 
+
+left join
+(Select T2.WhsName, sum(T4.LineTotal) Total_notas
+From ORIN T3
+Inner Join RIN1 T4 ON T3.DocEntry = T4.DocEntry
+Inner Join OWHS T2 on T4.WhsCode = T2.WhsCode
+Where T3.DocDate between  '1/11/2018' and getdate()-1
+Group by T2.WhsName) N_Credito
+on N_Credito.WhsName=ventas.WhsName

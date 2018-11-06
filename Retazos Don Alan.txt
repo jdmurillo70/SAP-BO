@@ -1,0 +1,58 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+Select 		T1.DocNum As 'Pedido'
+                                , T0.LineNum As 'Linea Pedido'
+				, T1.Docdate As 'Fecha de Pedido'
+				-- , T1.DocTime As 'Hora Pedido'
+				, T2.ItemName As 'Descripcion'
+				, Persiana = CASE
+					When CHARINDEX('Enrollable',T2.ItemName) > 0 
+						And IsNull(charindex('Premium',T2.ItemName),0) = 0 Then 'Enrollable'
+					When CHARINDEX('Premium',T2.ItemName) > 0 Then 'Premium'
+					When CHARINDEX('Sheer',T2.ItemName) > 0 Then 'Sheer'
+					When CHARINDEX('Panel',T2.ItemName)> 0 Then 'Panel Japonés'
+					When CHARINDEX('Romana', T2.ItemName) > 0 Then 'Romana'
+					When CHARINDEX('Madera', T2.ItemName)> 0 Then 'Macromadera'
+					When CHARINDEX('Venecian',T2.ItemName) > 0 Then 'Imperial'
+
+
+					END
+				, T4.ItemName As 'Tela Persiana'
+				, T0.Quantity As 'Cantidad'
+				, T0.Width1 As 'Ancho'
+				, T0.Height1 As 'Alto'
+				--, T1.DocDueDate As 'Requerido Entrega'
+				--, T5.CardName As 'Cliente'
+				--, T6.SlpName As 'Vendedor'
+				--, TipoDespacho = CASE
+					--	When T1.U_Despacho = 1 Then 'Ruta'
+					--	When T1.U_Despacho = 2 Then 'Recoge'
+					--	When T1.U_Despacho = 3 Then 'Safra Express'
+					--	When T1.U_Despacho = 4 Then 'Nacional'
+				--END
+				--, Motorizada = CASE
+				--		When T0.U_MotorEMR != 0 Then 'Motorizada'
+				--		When T0.U_MotPANRAP != 0 Then 'Motorizada'
+				--		Else ''
+				--END
+				--, Perfileria = CASE
+				--		When T0.U_Perfileria = 1 Then 'Corriente'
+				--		When T0.U_Perfileria = 2 Then 'Perfilum'
+				--		When T0.U_Perfileria = 3 Then 'Platina Aluminio'
+				--		When T0.U_Perfileria = 4 Then 'Lujo'
+				--		When T0.U_Perfileria = 5 Then 'Hierro'
+						
+				--END
+
+		
+--, T0.U_Perfileria	
+--, T0.U_Cenefa				
+--, T4.U_peso_tela
+--, T0.U_FijoP		
+From RDR1 T0
+Inner Join ORDR T1 On T0.Docentry = T1.DocEntry
+Inner Join OITM T2 On T0.ItemCode = T2.ItemCode
+--left Join dbo.[@SAFR_BODEGADESPACH] T3 On T1.DocNum = T3.U_NumeroPedido
+Left Join OITM T4 On T0.U_TelaPersiana = T4.ItemCode
+Inner Join OCRD T5 On T1.CardCode = T5.CardCode
+Inner Join OSLP T6 On T1.SlpCode = T6.SlpCode
+where left(T0.itemcode,1) In ('P','E') and T1.DocDate between getdate()- 180 and getdate ()-1 and t1.Canceled = 'N' 

@@ -1,0 +1,22 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+Select T0.ItemName,
+t0.ItemCode,
+concat(TR.Name,' ',TC.U_Color),
+-- inventario.inventario "Real",
+CASE WHEN inventario.Inventario < 20 THEN 0 ELSE Inventario.Inventario END Inventario
+
+From OITM T0
+INNER JOIN              
+                  (Select             T1.ItemCode,
+                  sum(T0.OnHand) Inventario
+                  FROM dbo.OITW T0
+                  Inner Join dbo.OITM T1 On T0.ItemCode = T1.ItemCode
+                  Inner Join dbo.OWHS T2 On T0.WhsCode = T2.WhsCode
+                  WHERE T0.WhsCode In ('10011','10015')
+                             AND U_GrupoProd='06'
+                  Group by T1.ItemCode) Inventario
+                  On T0.ItemCode = Inventario.ItemCode
+                             and U_GrupoProd='06'
+                             INNER JOIN [@TABLA_REFERENCIAS] TR ON TR.Code=T0.U_REFERENCIA
+                             INNER JOIN [@TABLA_DE_COLORES] TC ON TC.Code=T0.U_Colores
+

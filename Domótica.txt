@@ -1,0 +1,13 @@
+Allone Pro (dommotizar con wifi):  Controla radio frecuencia e infrarojo, copia las órdenes de un control remoto.  Como es radiofrecuencia,
+Se necesita uno por cada ambiente
+Ventaja wifi: control remoto del dispositivo y allone pro
+Ventaja Zigbee: no necesitas tener un controlador por ambiente
+
+Zigbee mini hub
+Zigbee relay, uno por cortina, tiene que ser motor de cuatro cables de cualquier marca
+
+Opcional Scene Switch
+
+Magic cube (wifi3}
+) solo infrarojo (tiene la biblioteca de marcas), se puede crear un control remoto desde cero
+Todos los sensores son zegbee

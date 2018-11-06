@@ -1,0 +1,67 @@
+Sub Report()
+
+Application.ScreenUpdating = False
+
+OpenFrequents
+Refresh
+
+End Sub
+Sub Report2()
+
+SaveBooks
+CloseBooks
+
+End Sub
+
+
+Sub OpenFrequents()
+
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Comercial Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Almacenes Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Persianas Regional Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Persianas Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Telas Bogotá Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Telas Nacional Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Pedidos por Vendedor Julio 2018.xlsx"
+Workbooks.Open Filename:="C:\Users\Juan Diego Murillo\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Oscar Ceballos.xlsx"
+
+End Sub
+Sub Refresh()
+Workbooks("Seguimiento Comercial Julio 2018.xlsx").RefreshAll
+Workbooks("Seguimiento Almacenes Julio 2018.xlsx").RefreshAll
+Workbooks("Seguimiento Ejecutivo Persianas Regional Julio 2018.xlsx").RefreshAll
+Workbooks("Seguimiento Ejecutivo Persianas Julio 2018.xlsx").RefreshAll
+Workbooks("Seguimiento Ejecutivo Telas Bogotá Julio 2018.xlsx").RefreshAll
+Workbooks("Seguimiento Ejecutivo Telas Nacional Julio 2018.xlsx").RefreshAll
+Workbooks("Pedidos por Vendedor Julio 2018.xlsx").RefreshAll
+Workbooks("Seguimiento Oscar Ceballos.xlsx").RefreshAll
+
+
+End Sub
+Sub SaveBooks()
+Workbooks("Seguimiento Comercial Julio 2018.xlsx").Save
+Workbooks("Seguimiento Almacenes Julio 2018.xlsx").Save
+Workbooks("Seguimiento Ejecutivo Persianas Regional Julio 2018.xlsx").Save
+Workbooks("Seguimiento Ejecutivo Persianas Julio 2018.xlsx").Save
+Workbooks("Seguimiento Ejecutivo Telas Bogotá Julio 2018.xlsx").Save
+Workbooks("Seguimiento Ejecutivo Telas Nacional Julio 2018.xlsx").Save
+Workbooks("Pedidos por Vendedor Julio 2018.xlsx").Save
+Workbooks("Seguimiento Oscar Ceballos.xlsx").Save
+
+
+End Sub
+
+Sub CloseBooks()
+Workbooks("Seguimiento Comercial Julio 2018.xlsx").Close
+Workbooks("Seguimiento Almacenes Julio 2018.xlsx").Close
+Workbooks("Seguimiento Ejecutivo Persianas Regional Julio 2018.xlsx").Close
+Workbooks("Seguimiento Ejecutivo Persianas Julio 2018.xlsx").Close
+Workbooks("Seguimiento Ejecutivo Telas Bogotá Julio 2018.xlsx").Close
+Workbooks("Seguimiento Ejecutivo Telas Nacional Julio 2018.xlsx").Close
+Workbooks("Pedidos por Vendedor Julio 2018.xlsx").Close
+Workbooks("Seguimiento Oscar Ceballos.xlsx").Close
+
+
+
+End Sub
+

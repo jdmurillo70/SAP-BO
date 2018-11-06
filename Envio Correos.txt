@@ -1,0 +1,551 @@
+Option Explicit
+
+Sub ASendMails()
+
+SendSegCome
+SendSegAlma
+SendSegPersREgi
+SendSegPers
+SendSegTelBogo
+SendSegTelaNal
+SendPedVende
+
+
+
+End Sub
+
+Sub SendSegCome()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Seguimiento Comercial Octubre"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "alansafdeye@safrasas.com"
+    
+    .Recipients.Add "jonathansafdeye@safrasas.com"
+    'Sepcify who it shoul be copied to
+    '.CC = "jdmurillo@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Comercial Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+Sub SendSegAlma()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Seguimiento Comercial Octubre Almacenes"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "b.martinez@safrasas.com"
+    .Recipients.Add "jefealmacenes@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Almacenes Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+Sub SendSegPersREgi()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Seguimiento Comercial Octubre Regional"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "ventasregional@safrasas.com"
+    .Recipients.Add "gerenciapersianas@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "jonathansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Persianas Regional Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+Sub SendSegPers()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Seguimiento Ejecutivo Comercial Persianas Octubre"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "gerenciapersianas@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+   
+    .CC = "jonathansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Persianas Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+Sub SendSegTelBogo()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Seguimiento Ejecutivo Comercial Telas Bogotá Octubre"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "b.martinez@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Telas Bogotá Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+Sub SendSegTelaNal()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Seguimiento Ejecutivo Comercial Telas Nacional Octubre"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "ventasnacionalestelas@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Seguimiento Ejecutivo Telas Nacional Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+Sub SendPedVende()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Pedidos Por Vendedor Octubre"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "gerenciapersianas@safrasas.com"
+    .Recipients.Add "servicioalcliente@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+   
+    .CC = "jonathansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Pedidos por Vendedor Octubre 2018.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+Sub AEnvMarg()
+
+SendMargAlm
+SendMargTelBog
+SendMargTelNal
+SendMargGer
+
+End Sub
+
+Sub SendMargGer()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Márgenes Telas Gerencia"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "alansafdeye@safrasas.com"
+    'Sepcify who it shoul be copied to
+    '.CC = "jdmurillo@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Márgenes Telas Gerencia.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+Sub SendMargTelNal()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Márgenes Telas Nacional"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "ventasnacionalestelas@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Márgenes Telas Nacional.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+Sub SendMargTelBog()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Márgenes Telas Bogotá"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "b.martinez@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Márgenes Telas Bogotá.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+
+Sub SendMargAlm()
+
+Dim olApp As Outlook.Application
+Dim olMail As Outlook.MailItem
+Dim blRunning As Boolean
+
+'get Application
+blRunning = True
+On Error Resume Next
+Set olApp = GetObject(, "Outlook.Application")
+If olApp Is Nothing Then
+    Set olApp = New Outlook.Application
+    blRunning = False
+End If
+
+On Error GoTo 0
+
+Set olMail = olApp.CreateItem(olMailItem)
+With olMail
+    'Specifiy the mail subjetc
+    .Subject = "Márgenes Almacenes"
+    'Specifiy who it should be sent to
+    'Repeat this line to add further recipients
+    .Recipients.Add "b.martinez@safrasas.com"
+    'Sepcify who it shoul be copied to
+    .CC = "alansafdeye@safrasas.com"
+    'Specify the file to attach
+    .Attachments.Add "C:\Users\JuanDiego\OneDrive - Persianas y Enrollables Safra\Datos adjuntos\Frecuentes\Márgenes Almacenes.xlsx"
+    'Specify the text to appear in the email
+    .Body = "PSI" & vbCrLf & vbCrLf & vbCrLf & "JDM"
+    'If you want to check before sending
+    '.Display
+    .Send
+    
+End With
+
+If Not blRunning Then olApp.Quit
+
+Set olApp = Nothing
+Set olMail = Nothing
+
+
+
+    
+End Sub
+
+
+
+
+

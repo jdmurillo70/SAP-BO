@@ -1,0 +1,100 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+Select Total.SlpName, 
+(Isnull(Total.Total,0)-Isnull(TotalNotas.TotalNotas,0))TotalNeto, 
+(Isnull(Telas.Telas,0)-ISNULL(NotasTelas.NotasTelas,0)) NetoTelas,  
+(Isnull(Insumos.Insumos,0)-Isnull(NotasInsumos.NotasInsumos,0))NetoINsumos,
+(Isnull(Persianas.Persianas,0)- Isnull(NotasPersianas.NotasPersianas,0))NetoPersianas, 
+(ISNULL(Pedidos.Pedidos,0)) Pedidos
+from
+(select T2.SlpName, Sum( case when T0.DiscPrcnt!=0 THEN T1.INMPrice*t1.Quantity ELSE T1.LineTotal END) Total
+From OINV T0
+Inner Join INV1 T1 ON  T0.DocEntry = T1.DocEntry
+Right Join OSLP T2 on T0.SlpCode = T2.SlpCode
+Where T0.DocDate between  '1/11/2018' and getdate()-1
+	and T0.CANCELED = 'N'
+Group by T2.SlpName) Total 
+
+left join
+(select T2.SlpName, Sum( case when T0.DiscPrcnt!=0 THEN T1.INMPrice*t1.Quantity ELSE T1.LineTotal END) Telas
+From OINV T0
+Inner Join INV1 T1 ON  T0.DocEntry = T1.DocEntry
+Inner Join OSLP T2 on T0.SlpCode = T2.SlpCode
+Inner Join OITM t3 On T1.ItemCode = T3.ItemCode
+Where T0.DocDate between  '1/11/2018' and getdate()-1
+	and T1.ItemCode like 'T%' 
+	and T3.ItmsGrpCod != 957
+	and T0.CANCELED ='N'
+Group by T2.SlpName) Telas
+on Total.SlpName = Telas.SlpName 
+
+left join
+(select T2.SlpName, Sum( case when T0.DiscPrcnt!=0 THEN T1.INMPrice*t1.Quantity ELSE T1.LineTotal END) Insumos
+From OINV T0
+Inner Join INV1 T1 ON  T0.DocEntry = T1.DocEntry
+Inner Join OSLP T2 on T0.SlpCode = T2.SlpCode
+Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+Where T0.DocDate between  '1/11/2018' and getdate()-1
+	and left(T1.ItemCode,1) = 'T'
+	and T3.ItmsGrpCod = 957
+	and T0.CANCELED ='N'
+Group by T2.SlpName) Insumos
+on Total.SlpName = Insumos.SlpName 
+
+left join
+(select T2.SlpName,Sum( case when T0.DiscPrcnt!=0 THEN T1.INMPrice*t1.Quantity ELSE T1.LineTotal END) Persianas
+From OINV T0
+Inner Join INV1 T1 ON  T0.DocEntry = T1.DocEntry
+Inner Join OSLP T2 on T0.SlpCode = T2.SlpCode
+Where T0.DocDate between  '1/11/2018' and getdate()-1
+	and T1.ItemCode like 'P%'
+	and T0.CANCELED ='N'
+Group by T2.SlpName) Persianas
+on Total.SlpName = Persianas.SlpName 
+
+Left join
+(select T2.SlpName, Sum(T4.LineTotal)TotalNotas
+From ORIN T3
+Inner Join RIN1 T4 ON  T3.DocEntry = T4.DocEntry
+left Join OSLP T2 on T3.SlpCode = T2.SlpCode
+Where T3.DocDate between  '1/11/2018' and getdate()-1
+Group by T2.SlpName) TotalNotas
+on Total.SlpName = TotalNotas.SlpName 
+
+Left Join
+(select T2.SlpName, Sum(T4.LineTotal) NotasTelas
+From ORIN T3
+Inner Join RIN1 T4 ON  T3.DocEntry = T4.DocEntry
+left Join OSLP T2 on T3.SlpCode = T2.SlpCode
+Inner Join OITM T5 On T4.ItemCode = T5.ItemCode	
+Where T3.DocDate between  '1/11/2018' and getdate()-1and T4.ItemCode like 'T%' and T5.ItmsGrpCod != 957
+Group by T2.SlpName) NotasTelas
+on Total.SlpName = NotasTelas.SlpName 
+
+Left Join
+(select T2.SlpName, Sum(T4.LineTotal) NotasInsumos
+From ORIN T3
+Inner Join RIN1 T4 ON  T3.DocEntry = T4.DocEntry
+left Join OSLP T2 on T3.SlpCode = T2.SlpCode
+Inner Join OITM t5 ON T4.Itemcode = T5.ItemCode
+Where T3.DocDate between  '1/11/2018' and getdate()-1 and Left(T4.ItemCode,1) = 'T' and T5.ItmsGrpCod = 957
+Group by T2.SlpName) NotasInsumos
+on Total.SlpName = NotasInsumos.SlpName left join
+(select T2.SlpName, Sum(T4.LineTotal) NotasPersianas
+From ORIN T3
+Inner Join RIN1 T4 ON  T3.DocEntry = T4.DocEntry
+left Join OSLP T2 on T3.SlpCode = T2.SlpCode
+Where T3.DocDate between  '1/11/2018' and getdate()-1and T4.ItemCode like 'P%'
+Group by T2.SlpName) Notaspersianas
+on Total.SlpName = NotasPersianas.SlpName
+
+Left Join
+(select T2.SlpName, SUM(T1.LineTotal)Pedidos
+	from ORDR T0
+	inner join RDR1 T1 On t0.DocEntry = t1.DocEntry
+	inner join OSLP T2 On T0.SlpCode = T2.SlpCode
+where t0.DocDueDate between'1/1/2017' and '28/2/2018'
+	and Left(T1.ItemCode,1) in ('P', 'I','M',)
+	and T0.CANCELED != 'Y'
+                and T0.Docdate between   '1/11/2018' and getdate()-1
+Group by t2.SlpName) Pedidos
+on Total.SlpName = Pedidos.SlpName

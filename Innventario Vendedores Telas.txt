@@ -1,0 +1,69 @@
+Select		LEFT(T0.ItemName, CharIndex(' ',T0.ItemName)) As 'Colección',
+			T0.ItemName As 'Descripción',
+			Isnull(ZF.ZF,0) As 'Zona Franca',
+			Principal.Principal As 'Inventario',
+			--Almacenes.Almacenes,
+			Isnull(Origen.Origen,0) Origen,
+			Isnull(Origen.LLega,0) LLega_O,
+			Isnull(Agua.Agua,0) Agua,
+			Isnull(Agua.LLega,0) LLega,
+			Isnull(Puerto.Puerto,0) Puerto,
+			Isnull(Puerto.LLega,0) LLega_P
+		
+
+From dbo.OITM T0
+iNNER Join dbo.OITB T1 On T0.ItmsGrpCod = T1.ItmsGrpCod
+
+lEFT Join
+(Select		T0.ItemCode, 
+			(T1.OnHand) Principal
+from dbo.OITM T0
+Inner Join OITW T1 On T0.ItemCode = T1.ItemCode
+Where T1.WhsCode = '10001') Principal
+On T0.ItemCode = Principal.ItemCode
+
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) ZF from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido In (5,8)
+Group by POR1.ItemCode) ZF
+On T0.ItemCode = ZF.ItemCode
+
+--Left Join
+--(Select		T0.ItemCode, 
+--			(T1.OnHand) Almacenes
+--from dbo.OITM T0
+--Inner Join OITW T1 On T0.ItemCode = T1.ItemCode
+--Where T1.WhsCode IN ('20001','30001','40001','50001','60001','70001'))Almacenes
+--On T0.ItemCode = Almacenes.ItemCode
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) Origen from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido In (1,3)
+Group by POR1.ItemCode) Origen
+On T0.ItemCode = Origen.ItemCode
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) Agua from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido = 2
+Group by POR1.ItemCode) Agua
+On T0.ItemCode = Agua.ItemCode
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) Puerto from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido In (4,7)
+Group by POR1.ItemCode) Puerto
+On T0.ItemCode = Puerto.ItemCode
+
+
+
+Where LEFT(T0.ItemCode,1) = 'T'
+Order by T0.ItmsGrpCod

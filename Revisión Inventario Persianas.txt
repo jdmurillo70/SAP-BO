@@ -1,0 +1,177 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+Select		T1.ItmsGrpNam,
+			T0.ItemName,
+			Isnull(produccion.inventario,0) As 'Inventario Producción',
+			Isnull(Ventas.inventario,0) As 'Inventario Ventas',
+			Isnull(ZF.ZF,0) As 'Zona Franca',
+			Isnull(Origen.Origen,0) Origen,
+			Isnull(Origen.LLega,0) LLega_O,
+			Isnull(Agua.Agua,0) Agua,
+			Isnull(Agua.LLega,0) LLega,
+			Isnull(Puerto.Puerto,0) Puerto,
+			Isnull(Puerto.LLega,0) LLega_P,
+			Isnull(Mayo.Quantity,0) As Mayo,
+ 			Isnull(Septiembre.Quantity,0) As Septiembre,
+ 			Isnull(Octubre.Quantity,0) As Octubre,
+ 			Isnull(Noviembre.Quantity,0) As Noviembre,
+ 			Isnull(abril.Quantity,0) As abril,
+ 			Isnull(Julio.Quantity,0) As Julio,
+ 			Isnull(Junio.Quantity,0) As Junio
+ 			, Isnull(Agosto.Quantity,0) As Agosto
+			, Isnull(ult30.Quantity,0) As Ult30
+			, getdate() Hoy
+			
+From OITM T0
+
+Inner Join OITB T1 On T0.ItmsGrpCod = T1.ItmsGrpCod
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between getdate()-31 and getdate()-1
+			Group by T1.ItemCode)Ult30
+			On T0.ItemCode = Ult30.ItemCode
+
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '1/5/2018' and '31/5/2018'
+			Group by T1.ItemCode)Mayo
+			On T0.ItemCode = Mayo.ItemCode
+			
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/09/2018' and '30/09/2018'
+			Group by T1.ItemCode)Septiembre
+			On T0.ItemCode = Septiembre.ItemCode
+			
+			
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/10/2018' and '31/10/2018'
+			Group by T1.ItemCode)Octubre
+			On T0.ItemCode = Octubre.ItemCode
+			
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/11/2018' and '30/11/2018'
+			Group by T1.ItemCode)Noviembre
+			On T0.ItemCode = Noviembre.ItemCode
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/4/2018' and '30/4/2018'
+			Group by T1.ItemCode)abril
+			On T0.ItemCode = abril.ItemCode
+
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/7/2018' and '31/7/2018'
+			Group by T1.ItemCode)Julio
+			On T0.ItemCode = Julio.ItemCode
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/6/2018' and '30/6/2018'
+			Group by T1.ItemCode)Junio
+			On T0.ItemCode = Junio.ItemCode
+			
+			
+Left Join
+			(select T1.ItemCode, sum(T1.Quantity) Quantity
+			from dbo.WTR1 T1
+			Inner Join OWTR T2 On T1.DocEntry = T2.DocEntry
+			Inner Join OITM T3 On T1.ItemCode = T3.ItemCode
+			Where T2.ToWhsCode In ('10013', '10013-2')  and T2.DocDate between '01/8/2018' and '31/8/2018'
+			Group by T1.ItemCode)Agosto
+			On T0.ItemCode = Agosto.ItemCode
+
+		
+		
+		
+			
+Left Join			
+			(Select		T1.ItemCode,
+			sum(T0.OnHand) Inventario
+			
+			from dbo.OITW T0
+			Inner Join dbo.OITM T1 On T0.ItemCode = T1.ItemCode
+			Inner Join dbo.OWHS T2 On T0.WhsCode = T2.WhsCode
+			Where T0.WhsCode In ('10011')
+			Group by T1.ItemCode) Produccion
+			On T0.ItemCode = Produccion.ItemCode
+			
+Left Join			
+			(Select		T1.ItemCode,
+			sum(T0.OnHand) Inventario
+			
+			from dbo.OITW T0
+			Inner Join dbo.OITM T1 On T0.ItemCode = T1.ItemCode
+			Inner Join dbo.OWHS T2 On T0.WhsCode = T2.WhsCode
+			Where T0.WhsCode In ('10015') 
+			Group by T1.ItemCode) Ventas
+			On T0.ItemCode = Ventas.ItemCode
+			
+
+			
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) Origen from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido In (1,3)
+Group by POR1.ItemCode) Origen
+On T0.ItemCode = Origen.ItemCode
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) Agua from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido = 2
+Group by POR1.ItemCode) Agua
+On T0.ItemCode = Agua.ItemCode
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) Puerto from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido In (4,7,6)
+Group by POR1.ItemCode) Puerto
+On T0.ItemCode = Puerto.ItemCode
+
+lEFT Join
+(Select ItemCode,(min(T1.U_FechaEstLlegada) +15) LLega ,SUM(OpenQty) ZF from POR1
+Inner Join OPOR on POR1.DocEntry = OPOR.DocEntry
+Left Join [@SAFR_ESTIMPORTACION] T1 On OPOR.NumAtCard = T1.Code
+where OPOR.DocStatus = 'O' AND T1.U_UbicacionPedido In (5,8,9)
+Group by POR1.ItemCode) ZF
+On T0.ItemCode = ZF.ItemCode
+
+where LEFT(t0.ItemCode,1) = 'i'
+
+order by T0.ItemName
